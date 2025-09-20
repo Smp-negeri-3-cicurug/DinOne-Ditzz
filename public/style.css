@@ -1,0 +1,361 @@
+/* Custom Properties */
+:root {
+    --bg-dark: #1e1a30;
+    --card-bg: #2b2540;
+    --accent-color: #ffc72c;
+    --accent-hover: #ffdf7a;
+    --text-light: #f0f0f0;
+    --text-muted: #a0a0a0;
+    --border-color: #443c5b;
+}
+
+/* Base Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    margin: 0;
+    padding: 0; /* Hapus padding agar tidak ada scrollbar */
+    height: 100vh;
+    overflow: hidden; /* Mencegah scrolling */
+}
+
+/* Update the container to use a different positioning method for animation */
+.container {
+    max-width: 900px;
+    width: calc(100% - 40px);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    
+    /* Perubahan di sini */
+    position: absolute; /* Ganti dari fixed ke absolute */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    /* Pastikan animasi tidak mengganggu transform posisi */
+    opacity: 0; /* Mulai dengan opasitas 0 untuk fade-in */
+    animation: fadeIn 0.8s ease-out forwards; /* Tambahkan 'forwards' */
+}
+
+/* Update the keyframes to only affect opacity */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        /* Hapus transform dari sini untuk menghindari konflik */
+    }
+    to { 
+        opacity: 1; 
+    }
+}
+
+
+.main-title {
+    font-size: 2rem;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 25px;
+}
+
+/* Input & Button Section */
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+#urlInput {
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background-color: #242036;
+    color: var(--text-light);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#urlInput::placeholder {
+    color: #706a80;
+}
+
+#urlInput:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(255, 199, 44, 0.4);
+}
+
+.btn {
+    padding: 15px 25px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: #2b2540;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    background-color: #4a455a;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loader */
+.loader {
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--accent-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Result Section */
+.result-section {
+    background-color: #3b3550;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 25px;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.video-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.thumbnail {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.video-title {
+    font-weight: 600;
+    margin: 0 0 5px;
+}
+
+.video-author {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.download-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.download-link {
+    display: block;
+    padding: 12px;
+    background-color: #4a455a;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.download-link:hover {
+    background-color: #5b556f;
+}
+
+/* Message Section */
+.message-section {
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    background-color: #5b3e40;
+    color: #ff9999;
+}
+
+.message-text {
+    margin: 0;
+}
+
+/* Features Section */
+.features {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 40px 0;
+}
+
+.feature-item {
+    text-align: center;
+}
+
+.feature-item h3 {
+    font-size: 1.2rem;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+}
+
+.feature-item p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* How-to Section */
+.how-to-use {
+    margin-bottom: 40px;
+}
+
+.how-to-use h2 {
+    font-size: 1.5rem;
+    color: var(--text-light);
+    margin-bottom: 20px;
+}
+
+.steps {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.steps li {
+    position: relative;
+    text-align: left;
+    padding-left: 45px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.step-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    background-color: var(--accent-color);
+    color: #2b2540;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+}
+
+/* Footer */
+.footer {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Desktop Media Queries */
+@media (min-width: 768px) {
+    .main-title {
+        font-size: 2.5rem;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+    }
+
+    .input-section {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    #urlInput {
+        flex: 1;
+    }
+
+    .features {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .how-to-use .steps {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .steps li {
+        max-width: 30%;
+    }
+}
+
+/* Message Types */
+.message-success {
+    background-color: rgba(40, 167, 69, 0.15);
+    color: #4caf50;
+    border: 1px solid rgba(40, 167, 69, 0.4);
+}
+
+.message-error {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #ff6b6b;
+    border: 1px solid rgba(220, 53, 69, 0.4);
+}
+
+.message-info {
+    background-color: rgba(23, 162, 184, 0.15);
+    color: #17a2b8;
+    border: 1px solid rgba(23, 162, 184, 0.4);
+}
+
+/* Smooth show/hide transition */
+.message-section,
+.result-section {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.message-section.show,
+.result-section.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Optional Glassmorphism polish */
+.message-section,
+.result-section {
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+}
