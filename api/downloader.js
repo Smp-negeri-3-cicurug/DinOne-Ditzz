@@ -25,16 +25,16 @@ export default async function handler(req) {
 
     const data = await apiRes.json();
 
-    if (!data.status || !data.download_urls) {
+    if (!data.status || !data.data?.download?.video) {
       return new Response(JSON.stringify({ error: "Data video tidak valid. Periksa URL." }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // Buat link HD dan audio
-    const hdUrl = data.download_urls.find(l => l.includes("nowatermark")) || null;
-    const audioUrl = data.download_urls.find(l => l.includes("music")) || null;
+    const videoArray = data.data.download.video;
+    const hdUrl = videoArray.find(v => v.includes("nowatermark")) || videoArray[0] || null;
+    const audioUrl = videoArray.find(v => v.includes("music")) || null;
 
     const downloadLinks = [];
     if (hdUrl) downloadLinks.push({ quality: "HD", url: `/api/download?url=${encodeURIComponent(hdUrl)}` });
@@ -42,9 +42,9 @@ export default async function handler(req) {
 
     const formattedData = {
       result: {
-        title: data.video_info.title || "Video Tanpa Judul",
-        thumbnail: data.video_info.cover || "",
-        author: { nickname: data.video_info.author_name || "Tidak Diketahui" },
+        title: data.data.metadata.title || "Video Tanpa Judul",
+        thumbnail: data.data.metadata.cover || data.data.download.video[0] || "",
+        author: { nickname: data.data.metadata.author || "Tidak Diketahui" },
         links: downloadLinks,
       },
     };
@@ -61,4 +61,4 @@ export default async function handler(req) {
       headers: { "Content-Type": "application/json" },
     });
   }
-        }
+}
