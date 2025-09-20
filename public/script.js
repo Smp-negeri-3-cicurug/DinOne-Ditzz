@@ -40,10 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Buka halaman hasil di tab baru
+            // Arahkan ke halaman hasil di tab yang sama
             const encodedData = btoa(JSON.stringify(data.result));
             const resultUrl = `/result.html?data=${encodedData}`;
-            window.open(resultUrl, '_blank');
+            window.location.href = resultUrl;
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -92,4 +92,4 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.urlInput.focus();
     }
 });
-                          
+            
