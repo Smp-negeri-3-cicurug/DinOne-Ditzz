@@ -35,7 +35,6 @@ export default async function handler(req) {
         });
     }
     
-    // Perbarui logika untuk membuat URL unduhan yang mengarah ke proxy Anda
     const downloadLinks = [
         { quality: 'HD', url: `/api/download?url=${encodeURIComponent(data.result.data.find(l => l.type === 'nowatermark_hd')?.url)}` },
         { quality: 'SD', url: `/api/download?url=${encodeURIComponent(data.result.data.find(l => l.type === 'nowatermark')?.url)}` },
@@ -63,5 +62,5 @@ export default async function handler(req) {
       headers: { "Content-Type": "application/json" },
     });
   }
-}
-  
+          }
+          
