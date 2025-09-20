@@ -78,16 +78,6 @@
     border-radius: 10px;
     display: none;
 }
-#refreshBtn {
-    margin-top: 15px;
-    padding: 10px 15px;
-    border-radius: 10px;
-    background-color: #ffc72c;
-    color: #000;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-}
 </style>
 </head>
 <body>
@@ -107,8 +97,6 @@
         </div>
     </div>
 
-    <button id="refreshBtn">Refresh</button>
-
     <div id="downloadLinks" class="download-links"></div>
 </div>
 
@@ -119,7 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoAuthor = document.getElementById('videoAuthor');
     const downloadLinks = document.getElementById('downloadLinks');
     const messageSection = document.getElementById('messageSection');
-    const refreshBtn = document.getElementById('refreshBtn');
+
+    // Mapping type API ke label tombol
+    const typeLabel = {
+        nowatermark: 'Unduh Video (SD)',
+        nowatermark_hd: 'Unduh Video (HD)',
+        music: 'Unduh Audio (MP3)'
+    };
 
     function showMessage(msg) {
         messageSection.textContent = msg;
@@ -140,13 +134,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function createDownloadButton(text, url) {
+    function createDownloadButton(link) {
         const a = document.createElement('a');
-        a.href = url;
+        a.href = link.url;
         a.className = 'download-link';
         a.download = true;
         a.rel = 'noopener noreferrer';
-        a.textContent = text;
+        a.textContent = typeLabel[link.type] || 'Unduh';
 
         const loader = document.createElement('div');
         loader.className = 'loader';
@@ -155,17 +149,19 @@ document.addEventListener('DOMContentLoaded', () => {
         a.addEventListener('click', async (e) => {
             e.preventDefault();
             loader.style.display = 'inline-block';
+
             try {
-                const response = await fetch(url);
+                const response = await fetch(link.url);
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
 
+                // Tampilkan ukuran file di console
                 const sizeMB = (blob.size / (1024*1024)).toFixed(2);
-                console.log(`${text} - Ukuran file: ${sizeMB} MB`);
+                console.log(`${a.textContent} - Ukuran file: ${sizeMB} MB`);
 
                 const tempLink = document.createElement('a');
                 tempLink.href = blobUrl;
-                tempLink.download = url.split('/').pop();
+                tempLink.download = link.url.split('/').pop();
                 document.body.appendChild(tempLink);
                 tempLink.click();
                 document.body.removeChild(tempLink);
@@ -181,34 +177,30 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadLinks.appendChild(a);
     }
 
-    function displayVideo(videoData) {
-        videoThumbnail.src = videoData.thumbnail || '';
-        videoThumbnail.onerror = () => { videoThumbnail.src = 'placeholder.jpg'; };
-        videoTitle.textContent = videoData.title || 'Video tanpa judul';
-        videoAuthor.textContent = videoData.author?.nickname || 'Unknown';
-
-        downloadLinks.innerHTML = '';
-        if (videoData.links && Array.isArray(videoData.links)) {
-            videoData.links.forEach(link => {
-                createDownloadButton(link.quality, link.url);
-            });
-        } else {
-            showMessage('Tidak ada tautan unduhan yang tersedia.');
-        }
-    }
-
-    function loadPageData() {
-        const data = loadVideoData();
-        if (!data) return;
-        displayVideo(data);
-        showMessage('');
-    }
-
-    loadPageData();
-
-    refreshBtn.addEventListener('click', () => {
-        loadPageData();
+    // Push to refresh
+    let touchStartY = 0;
+    document.addEventListener('touchstart', e => {
+        if (document.scrollingElement.scrollTop === 0) touchStartY = e.touches[0].clientY;
     });
+    document.addEventListener('touchmove', e => {
+        const touchCurrentY = e.touches[0].clientY;
+        if (touchCurrentY - touchStartY > 100) location.reload();
+    });
+
+    const videoData = loadVideoData();
+    if (!videoData) return;
+
+    videoThumbnail.src = videoData.thumbnail || '';
+    videoThumbnail.onerror = () => { videoThumbnail.src = 'placeholder.jpg'; };
+    videoTitle.textContent = videoData.title || 'Video tanpa judul';
+    videoAuthor.textContent = videoData.author?.nickname || 'Unknown';
+
+    downloadLinks.innerHTML = '';
+    if (videoData.links && Array.isArray(videoData.links)) {
+        videoData.links.forEach(link => createDownloadButton(link));
+    } else {
+        showMessage('Tidak ada tautan unduhan yang tersedia.');
+    }
 });
 </script>
 </body>
