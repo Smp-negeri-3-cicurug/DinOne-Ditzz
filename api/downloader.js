@@ -18,26 +18,25 @@ export default async function handler(req) {
     const apiRes = await fetch(`https://api.sxtream.xyz/downloader/tiktok?url=${encodeURIComponent(url)}`);
 
     if (!apiRes.ok) {
-        // Handle API errors gracefully, returning a user-friendly message
         const apiErrorText = await apiRes.text();
         console.error("API error response:", apiErrorText);
-        return new Response(JSON.stringify({ error: `Gagal dari API pihak ketiga. Status: ${apiRes.status}` }), {
+        return new Response(JSON.stringify({ error: "Gagal dari API pihak ketiga. Silakan coba tautan lain." }), {
             status: apiRes.status,
             headers: { "Content-Type": "application/json" },
         });
     }
     
+    // Periksa apakah respons adalah JSON yang valid
     const data = await apiRes.json();
 
-    // Pastikan properti 'result' ada dan bukan null
     if (!data.result) {
-        return new Response(JSON.stringify({ error: "API tidak mengembalikan data video yang valid." }), {
+        return new Response(JSON.stringify({ error: "API tidak mengembalikan data video yang valid. Pastikan tautan benar." }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });
     }
     
-    // Format data agar sesuai dengan frontend Anda
+    // Format data agar sesuai dengan frontend
     const formattedData = {
         result: {
             title: data.result.title,
@@ -58,9 +57,9 @@ export default async function handler(req) {
 
   } catch (err) {
     console.error("Kesalahan saat memproses permintaan:", err);
-    return new Response(JSON.stringify({ error: "Terjadi kesalahan server. Coba lagi nanti." }), {
+    return new Response(JSON.stringify({ error: "Terjadi kesalahan server saat memproses permintaan. Coba lagi." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
-}
+                        }
