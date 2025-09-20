@@ -1,4 +1,4 @@
-// File: backend/api/downloader.js
+// File: api/downloader.js
 export const config = {
   runtime: "edge",
 };
@@ -17,35 +17,38 @@ export default async function handler(req) {
   try {
     const apiRes = await fetch(`https://api.sxtream.xyz/downloader/tiktok?url=${encodeURIComponent(url)}`);
 
-    // Tambahkan pemeriksaan ini untuk menangani respons non-200 dari API
     if (!apiRes.ok) {
-      return new Response(JSON.stringify({ error: "Gagal memproses tautan dari API. Silakan coba tautan lain." }), {
-        status: apiRes.status,
-        headers: { "Content-Type": "application/json" },
-      });
+        // Handle API errors gracefully, returning a user-friendly message
+        const apiErrorText = await apiRes.text();
+        console.error("API error response:", apiErrorText);
+        return new Response(JSON.stringify({ error: `Gagal dari API pihak ketiga. Status: ${apiRes.status}` }), {
+            status: apiRes.status,
+            headers: { "Content-Type": "application/json" },
+        });
     }
     
     const data = await apiRes.json();
 
-    // Pastikan properti result ada sebelum memproses
+    // Pastikan properti 'result' ada dan bukan null
     if (!data.result) {
         return new Response(JSON.stringify({ error: "API tidak mengembalikan data video yang valid." }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });
     }
-
+    
+    // Format data agar sesuai dengan frontend Anda
     const formattedData = {
-      result: {
-        title: data.result.title,
-        thumbnail: data.result.cover,
-        author: data.result.author,
-        links: [
-          { quality: 'HD', url: data.result.data.find(l => l.type === 'nowatermark_hd')?.url },
-          { quality: 'SD', url: data.result.data.find(l => l.type === 'nowatermark')?.url },
-          { quality: 'audio', url: data.result.music_info?.url }
-        ]
-      }
+        result: {
+            title: data.result.title,
+            thumbnail: data.result.cover,
+            author: data.result.author,
+            links: [
+                { quality: 'HD', url: data.result.data.find(l => l.type === 'nowatermark_hd')?.url },
+                { quality: 'SD', url: data.result.data.find(l => l.type === 'nowatermark')?.url },
+                { quality: 'audio', url: data.result.music_info?.url }
+            ]
+        }
     };
 
     return new Response(JSON.stringify(formattedData), {
@@ -54,10 +57,10 @@ export default async function handler(req) {
     });
 
   } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ error: "Terjadi kesalahan server saat memproses permintaan." }), {
+    console.error("Kesalahan saat memproses permintaan:", err);
+    return new Response(JSON.stringify({ error: "Terjadi kesalahan server. Coba lagi nanti." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
-      }
+}
