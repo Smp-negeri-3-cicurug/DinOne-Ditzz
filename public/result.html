@@ -41,25 +41,31 @@
 .download-links { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
 .download-link {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding: 12px;
-    background-color: #4a455a;
+    background-color: #ffffff; /* tombol putih */
+    color: #000000; /* font hitam */
     border-radius: 10px;
-    color: #f0f0f0;
     text-decoration: none;
     font-size: 0.95rem;
-    transition: background-color 0.2s ease;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
-.download-link:hover { background-color: #5b556f; }
+.download-link:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+}
 .loader {
     border: 4px solid #443c5b;
     border-top: 4px solid #ffc72c;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     animation: spin 1s linear infinite;
     margin-left: 10px;
+    display: none;
 }
 @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -71,6 +77,16 @@
     background-color: #5b3e40;
     border-radius: 10px;
     display: none;
+}
+#refreshBtn {
+    margin-top: 15px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    background-color: #ffc72c;
+    color: #000;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
 }
 </style>
 </head>
@@ -91,6 +107,8 @@
         </div>
     </div>
 
+    <button id="refreshBtn">Refresh</button>
+
     <div id="downloadLinks" class="download-links"></div>
 </div>
 
@@ -101,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoAuthor = document.getElementById('videoAuthor');
     const downloadLinks = document.getElementById('downloadLinks');
     const messageSection = document.getElementById('messageSection');
+    const refreshBtn = document.getElementById('refreshBtn');
 
     function showMessage(msg) {
         messageSection.textContent = msg;
@@ -121,42 +140,75 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function createDownloadButton(text, url, size) {
+    function createDownloadButton(text, url) {
         const a = document.createElement('a');
         a.href = url;
         a.className = 'download-link';
         a.download = true;
         a.rel = 'noopener noreferrer';
-        a.innerHTML = `<span>${text}</span><span>${size}</span>`;
+        a.textContent = text;
 
         const loader = document.createElement('div');
         loader.className = 'loader';
-        loader.style.display = 'none';
         a.appendChild(loader);
 
-        a.addEventListener('click', (e) => {
+        a.addEventListener('click', async (e) => {
+            e.preventDefault();
             loader.style.display = 'inline-block';
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+
+                const sizeMB = (blob.size / (1024*1024)).toFixed(2);
+                console.log(`${text} - Ukuran file: ${sizeMB} MB`);
+
+                const tempLink = document.createElement('a');
+                tempLink.href = blobUrl;
+                tempLink.download = url.split('/').pop();
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                URL.revokeObjectURL(blobUrl);
+            } catch (err) {
+                console.error('Gagal mendownload:', err);
+                showMessage('Terjadi kesalahan saat mengunduh video.');
+            } finally {
+                loader.style.display = 'none';
+            }
         });
 
         downloadLinks.appendChild(a);
     }
 
-    const videoData = loadVideoData();
-    if (!videoData) return;
+    function displayVideo(videoData) {
+        videoThumbnail.src = videoData.thumbnail || '';
+        videoThumbnail.onerror = () => { videoThumbnail.src = 'placeholder.jpg'; };
+        videoTitle.textContent = videoData.title || 'Video tanpa judul';
+        videoAuthor.textContent = videoData.author?.nickname || 'Unknown';
 
-    videoThumbnail.src = videoData.thumbnail || '';
-    videoThumbnail.onerror = () => { videoThumbnail.src = 'placeholder.jpg'; };
-    videoTitle.textContent = videoData.title || 'Video tanpa judul';
-    videoAuthor.textContent = videoData.author?.nickname || 'Unknown';
-
-    downloadLinks.innerHTML = '';
-    if (videoData.links && Array.isArray(videoData.links)) {
-        videoData.links.forEach(link => {
-            createDownloadButton(link.quality, link.url, link.size);
-        });
-    } else {
-        showMessage('Tidak ada tautan unduhan yang tersedia.');
+        downloadLinks.innerHTML = '';
+        if (videoData.links && Array.isArray(videoData.links)) {
+            videoData.links.forEach(link => {
+                createDownloadButton(link.quality, link.url);
+            });
+        } else {
+            showMessage('Tidak ada tautan unduhan yang tersedia.');
+        }
     }
+
+    function loadPageData() {
+        const data = loadVideoData();
+        if (!data) return;
+        displayVideo(data);
+        showMessage('');
+    }
+
+    loadPageData();
+
+    refreshBtn.addEventListener('click', () => {
+        loadPageData();
+    });
 });
 </script>
 </body>
