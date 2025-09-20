@@ -18,10 +18,8 @@ export default async function handler(req) {
       return new Response(`Gagal mengunduh file. Status: ${response.status}`, { status: response.status });
     }
 
-    // Mendapatkan nama file dari URL
     const filename = videoUrl.split('/').pop().split('?')[0];
 
-    // Mengembalikan respons dengan video sebagai stream
     return new Response(response.body, {
       headers: {
         'Content-Type': 'video/mp4',
