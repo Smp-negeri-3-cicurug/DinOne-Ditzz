@@ -105,7 +105,7 @@
 
         .video-info {
             display: flex;
-            align-items: flex-start; /* Ubah ke flex-start */
+            align-items: flex-start;
             gap: 15px;
             text-align: left;
             margin-bottom: 20px;
@@ -116,31 +116,31 @@
             height: 80px;
             border-radius: 10px;
             object-fit: cover;
-            flex-shrink: 0; /* Tambahkan ini */
+            flex-shrink: 0;
         }
 
         .video-details {
-            display: flex; /* Tambahkan ini */
-            flex-direction: column; /* Tambahkan ini */
-            justify-content: center; /* Tambahkan ini */
-            min-width: 0; /* Tambahkan ini */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
         }
 
         .video-title {
             font-weight: 600;
             margin: 0 0 5px;
-            overflow: hidden; /* Tambahkan ini */
-            white-space: nowrap; /* Tambahkan ini */
-            text-overflow: ellipsis; /* Tambahkan ini */
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .video-author {
             font-size: 0.85rem;
             color: var(--text-muted);
             margin: 0;
-            overflow: hidden; /* Tambahkan ini */
-            white-space: nowrap; /* Tambahkan ini */
-            text-overflow: ellipsis; /* Tambahkan ini */
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .download-links {
@@ -228,7 +228,7 @@
                     try {
                         const decodedData = atob(encodedData);
                         const parsedData = JSON.parse(decodedData);
-                        return parsedData.result; // Ambil properti 'result'
+                        return parsedData; // Ubah ini: tidak perlu properti 'result'
                     } catch (e) {
                         console.error('Gagal mengurai data dari URL:', e);
                         return null;
@@ -267,11 +267,20 @@
             function displayDownloadLinks(links) {
                 elements.downloadLinks.innerHTML = '';
                 
-                // Pastikan ada link sebelum iterasi
                 if (links && Array.isArray(links)) {
                     links.forEach(link => {
                         if (link && link.url) {
-                            createDownloadButton(link.quality, link.url);
+                            let linkText;
+                            if (link.quality.toLowerCase() === 'hd') {
+                                linkText = 'Unduh Video (HD)';
+                            } else if (link.quality.toLowerCase() === 'sd') {
+                                linkText = 'Unduh Video (SD)';
+                            } else if (link.quality.toLowerCase() === 'audio') {
+                                linkText = 'Unduh Audio (MP3)';
+                            } else {
+                                linkText = 'Unduh';
+                            }
+                            createDownloadButton(linkText, link.url);
                         }
                     });
                 }
@@ -284,7 +293,7 @@
             function createDownloadButton(text, url) {
                 const a = document.createElement('a');
                 a.href = url;
-                a.textContent = 'Unduh ' + text;
+                a.textContent = text;
                 a.className = 'btn btn-primary download-link';
                 a.target = '_blank';
                 a.rel = 'noopener noreferrer';
