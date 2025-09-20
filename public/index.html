@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiktok Downloader - Unduh Video Tiktok Gratis</title>
+    <meta name="description" content="Unduh video dari TikTokl tanpa watermark dengan cepat dan mudah.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="main-title">Tiktok Downloader</h1>
+            <p class="subtitle">Unduh video dari TikTokltanpa watermark.</p>
+        </header>
+
+        <main class="main-content">
+            <div class="input-section">
+                <input type="text" id="urlInput" placeholder="Tempel tautan video di sini..." aria-label="Masukkan tautan video">
+                <button class="btn btn-primary" id="downloadBtn">Unduh</button>
+                <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                <div class="loader" style="display: none;"></div>
+            </div>
+
+            <div id="resultSection" class="result-section" style="display: none;">
+                <div class="video-info">
+                    <img id="videoThumbnail" class="thumbnail" alt="Video thumbnail">
+                    <div class="video-details">
+                        <p id="videoTitle" class="video-title"></p>
+                        <p id="videoAuthor" class="video-author"></p>
+                    </div>
+                </div>
+                <div id="downloadLinks" class="download-links"></div>
+            </div>
+
+            <div id="messageSection" class="message-section" style="display: none;">
+                <p id="messageText" class="message-text"></p>
+            </div>
+        </main>
+
+        <section class="features">
+            <div class="feature-item">
+                <h3>Multi-Platform</h3>
+                <p>Mendukung berbagai platform sosial media.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Tanpa Watermark</h3>
+                <p>Simpan video bebas dari logo dan watermark.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Gratis & Cepat</h3>
+                <p>Unduh video dengan kecepatan tinggi dan tanpa biaya.</p>
+            </div>
+        </section>
+
+        <section class="how-to-use">
+            <h2>Cara Menggunakan</h2>
+            <ol class="steps">
+                <li><span class="step-number">1</span> Cari video yang ingin Anda unduh.</li>
+                <li><span class="step-number">2</span> Salin tautan (link) dari video tersebut.</li>
+                <li><span class="step-number">3</span> Tempel tautan di atas dan klik Unduh</li>
+            </ol>
+        </section>
+
+        <footer class="footer">
+            <p>Created by Ditzz</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
