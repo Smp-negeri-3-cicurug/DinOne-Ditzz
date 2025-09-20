@@ -1,95 +1,80 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Cache DOM elements
-    const elements = {
-        downloadBtn: document.getElementById('downloadBtn'),
-        urlInput: document.getElementById('urlInput'),
-        loader: document.querySelector('.loader'),
-        messageSection: document.getElementById('messageSection'),
-        messageText: document.getElementById('messageText'),
-        resetBtn: document.getElementById('resetBtn'),
-    };
+document.addEventListener("DOMContentLoaded", () => {
+  const elements = {
+    downloadBtn: document.getElementById("downloadBtn"),
+    urlInput: document.getElementById("urlInput"),
+    loader: document.querySelector(".loader"),
+    messageSection: document.getElementById("messageSection"),
+    messageText: document.getElementById("messageText"),
+    resetBtn: document.getElementById("resetBtn"),
+  };
 
-    // Event listeners
-    elements.downloadBtn.addEventListener('click', handleDownload);
-    elements.urlInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleDownload();
-    });
-    elements.resetBtn.addEventListener('click', resetApp);
+  elements.downloadBtn.addEventListener("click", handleDownload);
+  elements.urlInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") handleDownload();
+  });
+  elements.resetBtn.addEventListener("click", resetApp);
 
-    /** Handles video download */
-    async function handleDownload() {
-        const url = elements.urlInput.value.trim();
-
-        if (!url || !isValidUrl(url)) {
-            showMessage('Silakan masukkan tautan video yang valid.', 'error');
-            return;
-        }
-
-        resetUI();
-        setLoadingState(true);
-
-        try {
-            const response = await fetch(`/api/downloader?url=${encodeURIComponent(url)}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-
-            if (data.error) {
-                showMessage(data.error, 'error');
-                return;
-            }
-
-            // Arahkan ke halaman hasil di tab yang sama
-            const encodedData = btoa(JSON.stringify(data.result));
-            const resultUrl = `/result.html?data=${encodedData}`;
-            window.location.href = resultUrl;
-
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            showMessage('Terjadi kesalahan jaringan. Pastikan koneksi internet Anda stabil.', 'error');
-        } finally {
-            setLoadingState(false);
-        }
+  async function handleDownload() {
+    const url = elements.urlInput.value.trim();
+    if (!url || !isValidUrl(url)) {
+      showMessage("Silakan masukkan tautan video yang valid.", "error");
+      return;
     }
 
-    /** Valid URL check */
-    function isValidUrl(string) {
-        try {
-            new URL(string);
-            return true;
-        } catch {
-            return false;
-        }
-    }
+    resetUI();
+    setLoadingState(true);
 
-    /** Toggle loading state */
-    function setLoadingState(isLoading) {
-        elements.loader.style.display = isLoading ? 'block' : 'none';
-        elements.downloadBtn.disabled = isLoading;
-        elements.downloadBtn.textContent = isLoading ? 'Memproses...' : 'Unduh';
-        elements.resetBtn.disabled = isLoading;
-    }
+    try {
+      const response = await fetch(`/api/downloader?url=${encodeURIComponent(url)}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      if (data.error) {
+        showMessage(data.error, "error");
+        return;
+      }
 
-    /** Show messages */
-    function showMessage(message, type = 'info') {
-        elements.messageText.textContent = message;
-        elements.messageSection.style.display = 'block';
-        elements.messageSection.className = `message-section message-${type} show`;
+      // Simpan hasil ke localStorage lalu redirect
+      localStorage.setItem("downloadResult", JSON.stringify(data.result));
+      window.location.href = "/result.html";
+    } catch (err) {
+      console.error("Fetch error:", err);
+      showMessage("Terjadi kesalahan jaringan. Pastikan koneksi internet stabil.", "error");
+    } finally {
+      setLoadingState(false);
     }
+  }
 
-    /** Reset UI sections */
-    function resetUI() {
-        elements.messageSection.classList.remove('show');
-        elements.messageSection.style.display = 'none';
+  function isValidUrl(str) {
+    try {
+      new URL(str);
+      return true;
+    } catch {
+      return false;
     }
+  }
 
-    /** Reset app state */
-    function resetApp() {
-        elements.urlInput.value = '';
-        resetUI();
-        setLoadingState(false);
-        elements.urlInput.focus();
-    }
+  function setLoadingState(isLoading) {
+    elements.loader.style.display = isLoading ? "block" : "none";
+    elements.downloadBtn.disabled = isLoading;
+    elements.downloadBtn.textContent = isLoading ? "Memproses..." : "Unduh";
+    elements.resetBtn.disabled = isLoading;
+  }
+
+  function showMessage(msg, type="info") {
+    elements.messageText.textContent = msg;
+    elements.messageSection.style.display = "block";
+    elements.messageSection.className = `message-section message-${type} show`;
+  }
+
+  function resetUI() {
+    elements.messageSection.classList.remove("show");
+    elements.messageSection.style.display = "none";
+  }
+
+  function resetApp() {
+    elements.urlInput.value = "";
+    resetUI();
+    setLoadingState(false);
+    elements.urlInput.focus();
+  }
 });
-            
