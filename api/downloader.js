@@ -15,7 +15,7 @@ export default async function handler(req) {
   }
 
   try {
-    const apiRes = await fetch(`https://api.sxtream.xyz/downloader/tiktok?url=${encodeURIComponent(url)}`);
+    const apiRes = await fetch(`https://api.siputzx.my.id/api/d/tiktok/v2?url=${encodeURIComponent(url)}`);
 
     if (!apiRes.ok) {
         const apiErrorText = await apiRes.text();
@@ -28,7 +28,7 @@ export default async function handler(req) {
     
     const data = await apiRes.json();
 
-    if (!data.result || !data.result.data || data.result.data.length === 0) {
+    if (!data.status || !data.download_urls) {
         return new Response(JSON.stringify({ error: "API tidak mengembalikan data video yang valid. Pastikan tautan benar." }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
@@ -36,16 +36,17 @@ export default async function handler(req) {
     }
     
     const downloadLinks = [
-        { quality: 'HD', url: `/api/download?url=${encodeURIComponent(data.result.data.find(l => l.type === 'nowatermark_hd')?.url)}` },
-        { quality: 'SD', url: `/api/download?url=${encodeURIComponent(data.result.data.find(l => l.type === 'nowatermark')?.url)}` },
-        { quality: 'audio', url: `/api/download?url=${encodeURIComponent(data.result.music_info?.url)}` }
+        { quality: 'HD', url: `/api/download?url=${encodeURIComponent(data.download_urls.find(l => l.includes('nowatermark')))}` },
+        { quality: 'audio', url: `/api/download?url=${encodeURIComponent(data.download_urls.find(l => l.includes('music')))}` }
     ];
 
     const formattedData = {
         result: {
-            title: data.result.title,
-            thumbnail: data.result.cover,
-            author: data.result.author,
+            title: data.video_info.title,
+            thumbnail: data.video_info.cover,
+            author: {
+              nickname: data.video_info.author_name
+            },
             links: downloadLinks
         }
     };
@@ -62,4 +63,5 @@ export default async function handler(req) {
       headers: { "Content-Type": "application/json" },
     });
   }
-        }
+}
+  
