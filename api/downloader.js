@@ -8,20 +8,33 @@ export default async function handler(req) {
   const url = searchParams.get("url");
 
   if (!url) {
-    return new Response(JSON.stringify({ error: "URL tidak ditemukan" }), {
+    return new Response(JSON.stringify({ error: "URL tidak ditemukan." }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }
 
   try {
-    // Perbarui URL API ke endpoint TikTok yang baru
     const apiRes = await fetch(`https://api.sxtream.xyz/downloader/tiktok?url=${encodeURIComponent(url)}`);
+
+    // Tambahkan pemeriksaan ini untuk menangani respons non-200 dari API
+    if (!apiRes.ok) {
+      return new Response(JSON.stringify({ error: "Gagal memproses tautan dari API. Silakan coba tautan lain." }), {
+        status: apiRes.status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    
     const data = await apiRes.json();
 
-    // Sekarang, Anda harus mengembalikan data yang diformat agar sesuai dengan frontend
-    // Frontend Anda mengharapkan 'data' yang berisi 'links', bukan 'result'
-    // Jadi, kita perlu memformat ulang responsnya
+    // Pastikan properti result ada sebelum memproses
+    if (!data.result) {
+        return new Response(JSON.stringify({ error: "API tidak mengembalikan data video yang valid." }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+        });
+    }
+
     const formattedData = {
       result: {
         title: data.result.title,
@@ -42,10 +55,9 @@ export default async function handler(req) {
 
   } catch (err) {
     console.error(err);
-    return new Response(JSON.stringify({ error: "Gagal memproses video. Pastikan tautan benar." }), {
+    return new Response(JSON.stringify({ error: "Terjadi kesalahan server saat memproses permintaan." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
-}
-  
+      }
