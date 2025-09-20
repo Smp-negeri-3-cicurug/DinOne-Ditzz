@@ -176,6 +176,26 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Loading Indicator Styles */
+        .loading-text {
+            font-size: 1rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -195,6 +215,10 @@
                     </div>
                 </div>
                 <div id="downloadLinks" class="download-links">
+                </div>
+                <div id="loadingIndicator" style="display: none; text-align: center;">
+                    <p class="loading-text">Sedang mengunduh...</p>
+                    <div class="spinner"></div>
                 </div>
             </div>
             <div id="messageSection" class="message-section" style="display: none;">
@@ -257,7 +281,7 @@
             function displayVideoInfo(data) {
                 elements.videoThumbnail.src = data.thumbnail || 'placeholder.jpg';
                 elements.videoThumbnail.onerror = () => {
-                    elements.videoThumbnail.src = 'placeholder.jpg'; // Ganti dengan URL gambar placeholder yang valid
+                    elements.videoThumbnail.src = 'placeholder.jpg';
                 };
                 elements.videoTitle.innerHTML = safeText(data.title || 'Video Tanpa Judul');
                 elements.videoAuthor.innerHTML = safeText(data.author.nickname || 'Tidak Diketahui');
@@ -298,9 +322,14 @@
                 a.download = true; 
                 a.rel = 'noopener noreferrer';
                 elements.downloadLinks.appendChild(a);
+
+                a.addEventListener('click', () => {
+                    elements.downloadLinks.style.display = 'none';
+                    document.getElementById('loadingIndicator').style.display = 'block';
+                });
             }
-                                  
         });
     </script>
 </body>
-</html>
+    </html>
+    
