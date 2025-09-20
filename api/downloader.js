@@ -26,27 +26,28 @@ export default async function handler(req) {
         });
     }
     
-    // Periksa apakah respons adalah JSON yang valid
     const data = await apiRes.json();
 
-    if (!data.result) {
+    if (!data.result || !data.result.data || data.result.data.length === 0) {
         return new Response(JSON.stringify({ error: "API tidak mengembalikan data video yang valid. Pastikan tautan benar." }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });
     }
     
-    // Format data agar sesuai dengan frontend
+    // Perbarui logika untuk membuat URL unduhan yang mengarah ke proxy Anda
+    const downloadLinks = [
+        { quality: 'HD', url: `/api/download?url=${encodeURIComponent(data.result.data.find(l => l.type === 'nowatermark_hd')?.url)}` },
+        { quality: 'SD', url: `/api/download?url=${encodeURIComponent(data.result.data.find(l => l.type === 'nowatermark')?.url)}` },
+        { quality: 'audio', url: `/api/download?url=${encodeURIComponent(data.result.music_info?.url)}` }
+    ];
+
     const formattedData = {
         result: {
             title: data.result.title,
             thumbnail: data.result.cover,
             author: data.result.author,
-            links: [
-                { quality: 'HD', url: data.result.data.find(l => l.type === 'nowatermark_hd')?.url },
-                { quality: 'SD', url: data.result.data.find(l => l.type === 'nowatermark')?.url },
-                { quality: 'audio', url: data.result.music_info?.url }
-            ]
+            links: downloadLinks
         }
     };
 
@@ -62,4 +63,5 @@ export default async function handler(req) {
       headers: { "Content-Type": "application/json" },
     });
   }
-                        }
+}
+  
