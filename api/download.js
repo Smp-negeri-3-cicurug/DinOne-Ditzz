@@ -1,47 +1,31 @@
-// File: api/download.js
-export const config = {
-  runtime: "edge",
-};
+export const config = { runtime: "edge" };
 
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
-  const fileUrl = searchParams.get("url");
+  const videoUrl = searchParams.get("url");
 
-  if (!fileUrl) {
-    return new Response("URL file tidak ditemukan.", { status: 400 });
+  if (!videoUrl) {
+    return new Response("URL video tidak ditemukan.", { status: 400 });
   }
 
   try {
-    // Tambahkan timeout untuk keamanan (10 detik)
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-
-    const response = await fetch(fileUrl, { signal: controller.signal });
-    clearTimeout(timeout);
-
+    const response = await fetch(videoUrl);
     if (!response.ok) {
       return new Response(`Gagal mengunduh file. Status: ${response.status}`, { status: response.status });
     }
 
-    // Tentukan nama file dengan fallback
-    let filename = "download";
-    try {
-      filename = new URL(fileUrl).pathname.split("/").pop() || "download";
-    } catch (e) {
-      console.warn("Gagal parsing nama file, fallback ke 'download'");
-    }
-
-    // Tentukan content-type dengan fallback
-    const contentType = response.headers.get("content-type") || "application/octet-stream";
+    // Ambil nama file dari URL
+    const filename = videoUrl.split("/").pop().split("?")[0] || "video.mp4";
 
     return new Response(response.body, {
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": "video/mp4",
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
-  } catch (error) {
-    console.error("Kesalahan saat mengunduh:", error);
-    return new Response("Terjadi kesalahan saat mengunduh file.", { status: 500 });
+
+  } catch (err) {
+    console.error("Download error:", err);
+    return new Response("Terjadi kesalahan saat mengunduh video.", { status: 500 });
   }
-                   }
+}
