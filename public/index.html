@@ -1,35 +1,116 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTok Downloader</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiktok Downloader - Unduh Video Tiktok Gratis</title>
+<link href="style.css" rel="stylesheet">
+<style>
+/* Loader */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ffc72c;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin { 0%{ transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1 class="main-title">Tiktok Downloader</h1>
-      <p class="subtitle">Tempelkan tautan video TikTok untuk mengunduh tanpa watermark.</p>
+<div class="container">
+    <header class="header">
+        <h1 class="main-title">Tiktok Downloader</h1>
+        <p class="subtitle">Unduh video dari TikTok tanpa watermark.</p>
     </header>
 
-    <main>
-      <div class="input-section">
-        <input type="text" id="urlInput" placeholder="Tempelkan URL video di sini..." />
-        <button id="downloadBtn" class="btn btn-primary">Unduh</button>
-        <button id="resetBtn" class="btn">Reset</button>
-      </div>
-      <div class="loader" style="display:none;"></div>
-      <div id="messageSection" class="message-section" style="display:none;">
-        <p id="messageText" class="message-text"></p>
-      </div>
+    <main class="main-content">
+        <div class="input-section">
+            <input type="text" id="urlInput" placeholder="Tempel tautan video di sini...">
+            <button class="btn btn-primary" id="downloadBtn">Unduh</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset</button>
+            <div id="loader" class="loader" style="display:none;"></div>
+        </div>
+        <div id="messageSection" class="message-section" style="display:none;">
+            <p id="messageText"></p>
+        </div>
     </main>
 
+    <section class="features">
+        <div class="feature-item">
+            <h3>Multi-Platform</h3><p>Mendukung berbagai platform sosial media.</p>
+        </div>
+        <div class="feature-item">
+            <h3>Tanpa Watermark</h3><p>Simpan video bebas logo dan watermark.</p>
+        </div>
+        <div class="feature-item">
+            <h3>Gratis & Cepat</h3><p>Unduh video dengan kecepatan tinggi tanpa biaya.</p>
+        </div>
+    </section>
+
+    <section class="how-to-use">
+        <h2>Cara Menggunakan</h2>
+        <ol class="steps">
+            <li><span class="step-number">1</span> Cari video yang ingin Anda unduh.</li>
+            <li><span class="step-number">2</span> Salin tautan (link) video.</li>
+            <li><span class="step-number">3</span> Tempel tautan di atas dan klik Unduh.</li>
+        </ol>
+    </section>
+
     <footer class="footer">
-      <p>© 2025 TikTok Downloader</p>
+        <p>Created by Ditzz</p>
     </footer>
-  </div>
-  <script src="script.js"></script>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+    const urlInput = document.getElementById('urlInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const loader = document.getElementById('loader');
+    const messageSection = document.getElementById('messageSection');
+    const messageText = document.getElementById('messageText');
+
+    downloadBtn.addEventListener('click', handleDownload);
+    urlInput.addEventListener('keypress', e=>{ if(e.key==='Enter') handleDownload(); });
+    resetBtn.addEventListener('click', resetApp);
+
+    function showLoader(){ loader.style.display='block'; downloadBtn.disabled=true; resetBtn.disabled=true; }
+    function hideLoader(){ loader.style.display='none'; downloadBtn.disabled=false; resetBtn.disabled=false; }
+
+    function showMessage(msg){
+        if(msg){ messageText.textContent=msg; messageSection.style.display='block'; }
+        else{ messageSection.style.display='none'; }
+    }
+
+    function isValidUrl(str){
+        try{ new URL(str); return true; }catch{return false;}
+    }
+
+    async function handleDownload(){
+        const url = urlInput.value.trim();
+        if(!url || !isValidUrl(url)){ showMessage('Silakan masukkan tautan video yang valid.'); return; }
+
+        showMessage(''); showLoader();
+        try{
+            const res = await fetch(`/api/downloader?url=${encodeURIComponent(url)}`);
+            const data = await res.json();
+
+            if(!res.ok || data.error){ showMessage(data.error || 'Terjadi kesalahan saat memproses tautan.'); }
+            else{
+                localStorage.setItem('videoData', JSON.stringify(data.result));
+                window.location.href='/result.html';
+            }
+        }catch(err){
+            showMessage('Terjadi kesalahan jaringan. Periksa koneksi Anda.');
+            console.error(err);
+        }finally{ hideLoader(); }
+    }
+
+    function resetApp(){ urlInput.value=''; showMessage(''); hideLoader(); urlInput.focus(); }
+});
+</script>
 </body>
 </html>
