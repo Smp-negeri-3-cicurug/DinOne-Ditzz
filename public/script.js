@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Buka halaman hasil di tab baru
             const encodedData = btoa(JSON.stringify(data.result));
-            const resultUrl = `/public/result.html?data=${encodedData}`;
+            const resultUrl = `/result.html?data=${encodedData}`;
             window.open(resultUrl, '_blank');
 
         } catch (error) {
@@ -92,3 +92,4 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.urlInput.focus();
     }
 });
+                          
