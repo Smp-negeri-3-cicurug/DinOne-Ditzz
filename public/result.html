@@ -228,7 +228,7 @@
                     try {
                         const decodedData = atob(encodedData);
                         const parsedData = JSON.parse(decodedData);
-                        return parsedData; // Ubah ini: tidak perlu properti 'result'
+                        return parsedData;
                     } catch (e) {
                         console.error('Gagal mengurai data dari URL:', e);
                         return null;
@@ -295,10 +295,11 @@
                 a.href = url;
                 a.textContent = text;
                 a.className = 'btn btn-primary download-link';
-                a.target = '_blank';
+                a.download = true; 
                 a.rel = 'noopener noreferrer';
                 elements.downloadLinks.appendChild(a);
             }
+                                  
         });
     </script>
 </body>
